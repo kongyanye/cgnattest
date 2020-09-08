@@ -4,6 +4,7 @@ import pdb
 import random
 import string
 import ipaddress
+import time
 
 def ssh_fgt(ipadd,user,pwd,command):
     client = SSHClient()
@@ -21,16 +22,17 @@ def get_random_string(length):
  result_str = ''.join(random.choice(letters) for i in range(length))
  return(result_str)
 
-# in python2.7 must use unicode so must use u'xxx'
-
-startip=u'10.10.10.1'
-endip=u'10.10.20.254'
+startip=u"10.10.11.1"
+endip=u"10.10.11.3"
 # below is to convert to integer format
-ip_start = int( ipaddress.ip_address(startip.decode('utf-8')) )
-ip_end = int( ipaddress.ip_address(decode('utf-8')) )
+ip_start = int( ipaddress.ip_address(startip) )
+ip_end = int( ipaddress.ip_address(endip) )
 
-startport=9949
-endport=10700
+startport=10001
+endport=10300
+#startport=10001
+#endport=10002
+
 ipdest="10.20.20.2"
 
 # by filling below parameter, we can issue diag sys session clear when num of session reach the max
@@ -41,6 +43,7 @@ fgtpass="fortinet"
 numport=0
 maxportperuser=302
 
+sleepcounter = 1
 # make sure that fgt session is clear first before doing test
 ssh_fgt(fgtip, fgtuser, fgtpass, "diag sys session clear")
  
@@ -56,33 +59,14 @@ for x in range(ip_start,ip_end+1):
         
         numport = numport + 1
         if ( numport > maxportperuser ):
-            ssh_fgt(fgtip, fgtuser, fgtpass, "diag sys session clear")
+#            ssh_fgt(fgtip, fgtuser, fgtpass, "diag sys session clear")
             numport = 0
-
+ 
         sendp(pkt, verbose=False)
-
-
-
-'''
-this module works !!
->>> a='10.10.10.1'
->>> b='10.10.13.2'
->>> x=int(ipaddress.ip_address(a))
->>> y=int(ipaddress.ip_address(b))
->>> print (x,' ',y)
-168430081   168430850
->>> for i in range(x,y):
-...     print ipaddress.ip_address(i)
-  File "<stdin>", line 2
-    print ipaddress.ip_address(i)
-          ^
-SyntaxError: invalid syntax
->>> for i in range(x,y+1):
-...     print (ipaddress.ip_address(i))
-...
-10.10.10.1
-10.10.10.2
-10.10.10.3
-10.10.10.4
-10.10.10.5
-'
+# to make sure no packet loss received on the server side because serverside will do a print out to screen
+# every 100 seconds
+        if ( sleepcounter == 100 ):
+           time.sleep(1)
+           sleepcounter = 0
+        else:
+           sleepcounter = sleepcounter+1
