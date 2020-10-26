@@ -8,10 +8,10 @@ def get_random_string(length):
  result_str = ''.join(random.choice(letters) for i in range(length))
  return(result_str)
  
-startip=71
-endip=90
-startport=49000
-endport=49100
+startip=5
+endip=204
+startport=9949
+endport=10500
 ipdest="10.20.20.2"
 
  
@@ -25,3 +25,4 @@ for x in range(startip,endip):
 	pkt = Ether()/IP(src=ipsrc,dst=ipdest)/UDP(sport=y,dport=53)/DNS(rd=1,qd=DNSQR(qname = qstr))
  	print(ipsrc+" : "+str(y))
 	sendp(pkt, verbose=False)
+

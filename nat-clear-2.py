@@ -5,7 +5,6 @@ import random
 import string
 import ipaddress
 import time
-import sys
 
 def ssh_fgt(ipadd,user,pwd,command):
     client = SSHClient()
@@ -23,26 +22,17 @@ def get_random_string(length):
  result_str = ''.join(random.choice(letters) for i in range(length))
  return(result_str)
 
-try:
-   x = sys.argv[1]
-   if ( x=="summary" ):
-      summary = True
-   else:
-      summary = False
-except:
-   summary = False
-
 startip=u"10.10.10.101"
-endip=u"10.10.10.110"
+endip=u"10.10.10.102"
 
 #startip=u"10.10.50.1"
-#endip=u"10.10.50.2"
+#endip=u"10.10.50.100"
 # below is to convert to integer format
 ip_start = int( ipaddress.ip_address(startip) )
 ip_end = int( ipaddress.ip_address(endip) )
 
 startport=10001
-endport=11000
+endport=10250
 #startport=10001
 #endport=10002
 
@@ -63,17 +53,12 @@ ssh_fgt(fgtip, fgtuser, fgtpass, "diag sys session clear")
 for x in range(ip_start,ip_end+1):
  # need to convert back from integer to string IP-format 
  ipsrc = str(ipaddress.ip_address(x))
-
- if ( summary ) :
-     print ( ipsrc )
-
  for y in range(startport,endport+1):
                 
 # modify dns to ip1.ip2.ip3.ip4.sport.test
         qstr = ipsrc+"."+str(y)+".test"
         pkt = Ether()/IP(src=ipsrc,dst=ipdest)/UDP(sport=y,dport=53)/DNS(rd=1,qd=DNSQR(qname = qstr))
-        if ( not summary ):
-               print(ipsrc+" : "+str(y))
+        print(ipsrc+" : "+str(y))
         
         numport = numport + 1
         if ( numport > maxportperuser ):

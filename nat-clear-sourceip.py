@@ -24,7 +24,23 @@ def get_random_string(length):
  return(result_str)
 
 try:
-   x = sys.argv[1]
+  source = sys.argv[1]
+  startip = unicode(source,'utf-8') 
+except:
+  print ("You must give first parameter for source ip")
+  exit()
+
+try :
+   x = sys.argv[2]
+   if ( x=="clear" ):
+     sessionclear = True
+   else:
+     sessionclear = False
+except:
+     sessionclear = False
+
+try:
+   x = sys.argv[3]
    if ( x=="summary" ):
       summary = True
    else:
@@ -32,19 +48,10 @@ try:
 except:
    summary = False
 
-startip=u"10.10.10.101"
-endip=u"10.10.10.110"
-
-#startip=u"10.10.50.1"
-#endip=u"10.10.50.2"
-# below is to convert to integer format
 ip_start = int( ipaddress.ip_address(startip) )
-ip_end = int( ipaddress.ip_address(endip) )
 
 startport=10001
 endport=11000
-#startport=10001
-#endport=10002
 
 ipdest="10.20.20.2"
 
@@ -58,16 +65,17 @@ maxportperuser=302
 
 sleepcounter = 1
 # make sure that fgt session is clear first before doing test
-ssh_fgt(fgtip, fgtuser, fgtpass, "diag sys session clear")
- 
-for x in range(ip_start,ip_end+1):
- # need to convert back from integer to string IP-format 
- ipsrc = str(ipaddress.ip_address(x))
+# if sessionclear only
 
- if ( summary ) :
+if ( sessionclear ) :
+     ssh_fgt(fgtip, fgtuser, fgtpass, "diag sys session clear")
+ 
+ipsrc = str(ipaddress.ip_address(startip))
+
+if ( summary ) :
      print ( ipsrc )
 
- for y in range(startport,endport+1):
+for y in range(startport,endport+1):
                 
 # modify dns to ip1.ip2.ip3.ip4.sport.test
         qstr = ipsrc+"."+str(y)+".test"
@@ -88,3 +96,6 @@ for x in range(ip_start,ip_end+1):
            sleepcounter = 0
         else:
            sleepcounter = sleepcounter+1
+
+print ( ipsrc, " *** FINISH *** ")
+
